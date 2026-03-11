@@ -68,6 +68,45 @@ public class RecibeGestos : MonoBehaviour
     {
         Debug.Log("Gesto recibido: " + message);
 
+        // 1. Estado de Preparación
+        if (message == "READY")
+        {
+            // Si el MIDI estaba pausado, lo prepara
+            //midiPlayer.MPTK_UnPause();
+            // Opcional: Podrías bajar el volumen o resetear la posición al inicio
+            //midiPlayer.MPTK_TickCurrent = 0;
+            //Debug.Log("Director preparado...");
+
+            midiPlayer.MPTK_Stop();
+            midiPlayer.MPTK_TickCurrent = 0;
+            calderonActive = false; // Resetear estados
+            Debug.Log("Director en posición correcta.");
+            break;
+        }
+
+        // 2. Inicio de la música (al detectar movimiento)
+        if (message == "START")
+        {
+            if (!midiPlayer.MPTK_IsPlaying)
+                midiPlayer.MPTK_Play();
+            else
+                midiPlayer.MPTK_UnPause();
+
+            Debug.Log("Iniciando música...");
+        }
+
+        // 3. Finalización (Cut-off)
+        if (message == "STOP")
+        {
+            //midiPlayer.MPTK_Stop();
+            //Debug.Log("Final de la pieza.");
+            midiPlayer.MPTK_Stop();
+            // Importante: Asegurar que el volumen no se quede en 0
+            if (midiPlayer.MPTK_Volume < 0.2f) midiPlayer.MPTK_Volume = 0.5f;
+            Debug.Log("Parando la música...");
+            break;
+        }
+
         // Gesto del calderon
         if (message == "CALDERON") calderonActive = true;
         else if (message == "OFF_CALDERON") calderonActive = false; // Necesitas una señal para apagarlo
