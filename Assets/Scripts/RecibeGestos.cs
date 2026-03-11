@@ -81,7 +81,6 @@ public class RecibeGestos : MonoBehaviour
             midiPlayer.MPTK_TickCurrent = 0;
             calderonActive = false; // Resetear estados
             Debug.Log("Director en posición correcta.");
-            break;
         }
 
         // 2. Inicio de la música (al detectar movimiento)
@@ -104,7 +103,6 @@ public class RecibeGestos : MonoBehaviour
             // Importante: Asegurar que el volumen no se quede en 0
             if (midiPlayer.MPTK_Volume < 0.2f) midiPlayer.MPTK_Volume = 0.5f;
             Debug.Log("Parando la música...");
-            break;
         }
 
         // Gesto del calderon
@@ -116,13 +114,13 @@ public class RecibeGestos : MonoBehaviour
         if (message == "STOP") midiPlayer.MPTK_Stop();
         if (message == "READY") midiPlayer.MPTK_UnPause();
 
-        // Volumen (Corregido el error de las llaves {})
+        // Volumen 
         if (message == "VOLUME_UP")
         {
-            midiPlayer.MPTK_Volume += 0.50f;
+            midiPlayer.MPTK_Volume += 0.25f;
             Debug.Log("Subiendo volumen...");
         }
-        if (message == "VOLUME_DOWN")
+        else if (message == "VOLUME_DOWN")
         {
             midiPlayer.MPTK_Volume -= 0.15f;
         }
