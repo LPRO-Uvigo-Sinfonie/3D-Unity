@@ -53,7 +53,7 @@ public class RecibeGestos : MonoBehaviour
         {
             try
             {
-                var clientSocket = this.socket.Accept();                        // waits for 'client' to 'connect'
+                var s = this.socket.Accept();                        // waits for 'client' to 'connect'
 
                 while (this.running)
                 {
