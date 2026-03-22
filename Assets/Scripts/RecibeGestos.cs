@@ -3,15 +3,17 @@ using System.Net.Sockets;
 using System.Text;
 using MidiPlayerTK;
 using UnityEngine;
+using System.IO;
+using System;
+using System.Threading;
 
 public class RecibeGestos : MonoBehaviour
 {
     public MidiFilePlayer midiPlayer;
     public bool calderonActive;
+    private bool running = false;
 
-    UdpClient client;
-    int port = 5005;
-
+    private Socket socket;
     // Para manejar los hilos de forma segura
     private string lastMessage = "";
     private bool newMessageReceived = false;
@@ -25,24 +27,54 @@ public class RecibeGestos : MonoBehaviour
 
         calderonActive = false; // Corregido: ya no sombrea la variable global
 
-        client = new UdpClient(port);
-        client.BeginReceive(Receive, null);
+        string unixPath = Path.Combine(Path.GetTempPath(), "sinfonie-server.socket");
+
+        Debug.Log(unixPath);
+
+
+        if (System.IO.File.Exists(unixPath))
+            System.IO.File.Delete(unixPath);
+
+        UnixDomainSocketEndPoint endpoint = new UnixDomainSocketEndPoint(unixPath);
+
+        socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
+        socket.Bind(endpoint);
+        socket.Listen(5);
+
+        running = true;
+
+        Thread w = new Thread(worker);
+        w.Start();
     }
 
-    void Receive(System.IAsyncResult result)
+    private void worker()
     {
-        IPEndPoint ip = new IPEndPoint(IPAddress.Any, port);
-        byte[] data = client.EndReceive(result, ref ip);
-        string message = Encoding.UTF8.GetString(data);
-
-        // Guardamos el mensaje de forma segura para el hilo principal
-        lock (lockObject)
+        while (this.running)
         {
-            lastMessage = message;
-            newMessageReceived = true;
-        }
+            try
+            {
+                var clientSocket = this.socket.Accept();                        // waits for 'client' to 'connect'
 
-        client.BeginReceive(Receive, null);
+                while (this.running)
+                {
+                    byte[] d = new byte[s.ReceiveBufferSize];
+
+                    int length = s.Receive(d);
+
+                    string message = Encoding.UTF8.GetString(d);
+
+                    lock (lockObject)
+                    {
+                        lastMessage = message;
+                        newMessageReceived = true;
+                    }
+                    
+                }
+
+                s.Close();
+            }
+            catch (Exception) { }
+        }
     }
 
     void Update()
