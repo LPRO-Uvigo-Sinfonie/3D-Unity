@@ -52,7 +52,7 @@ public class RecibeGestos : MonoBehaviour
 
                     if (length == 0) break;
 
-                    string message = Encoding.UTF8.GetString(d);
+                    string message = Encoding.UTF8.GetString(d, 0, length).Trim();
 
                     lock (lockObject)
                     {
