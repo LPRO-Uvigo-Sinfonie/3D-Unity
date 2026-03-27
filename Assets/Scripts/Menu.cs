@@ -1,10 +1,12 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; 
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Menu : MonoBehaviour
 {
     public GameObject menuOpciones;
     public GameObject menuPrincipal;
+    private string mapaSeleccionado = "Null";
 
     public void HabilitarPanelOpciones()
     {
@@ -26,8 +28,19 @@ public class Menu : MonoBehaviour
         Application.Quit(); 
     }
 
+    // Seleccion de mapa
+    public void SetMapa(string nombreDelMapa)
+    {
+        Debug.Log("Mapa seleccionado: " + nombreDelMapa);
+        mapaSeleccionado = nombreDelMapa;
+        
+    }
+
     public void IrAlMapa()
     {
-        SceneManager.LoadScene("SampleScene");
+        if (!string.IsNullOrEmpty(mapaSeleccionado) || mapaSeleccionado == "Null")
+        {
+            SceneManager.LoadScene(mapaSeleccionado);
+        }
     }
 }

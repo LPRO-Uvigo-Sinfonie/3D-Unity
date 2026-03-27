@@ -3,15 +3,17 @@ using System.Net.Sockets;
 using System.Text;
 using MidiPlayerTK;
 using UnityEngine;
+using System.IO;
+using System;
+using System.Threading;
 
 public class RecibeGestos : MonoBehaviour
 {
     public MidiFilePlayer midiPlayer;
     public bool calderonActive;
+    private bool running = false;
 
-    UdpClient client;
-    int port = 5005;
-
+    private TcpListener listener;
     // Para manejar los hilos de forma segura
     private string lastMessage = "";
     private bool newMessageReceived = false;
@@ -19,30 +21,54 @@ public class RecibeGestos : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("Buenas noches caballero");
+        Debug.Log("Start");
         if (midiPlayer == null)
             midiPlayer = FindObjectOfType<MidiFilePlayer>();
 
         calderonActive = false; // Corregido: ya no sombrea la variable global
 
-        client = new UdpClient(port);
-        client.BeginReceive(Receive, null);
+        listener = new TcpListener(IPAddress.Any, 5005);
+        listener.Start();
+
+        running = true;
+
+        Thread w = new Thread(worker);
+        w.Start();
     }
 
-    void Receive(System.IAsyncResult result)
+    private void worker()
     {
-        IPEndPoint ip = new IPEndPoint(IPAddress.Any, port);
-        byte[] data = client.EndReceive(result, ref ip);
-        string message = Encoding.UTF8.GetString(data);
-
-        // Guardamos el mensaje de forma segura para el hilo principal
-        lock (lockObject)
+        while (this.running)
         {
-            lastMessage = message;
-            newMessageReceived = true;
-        }
+            try
+            {
+                var s = this.listener.AcceptSocket();                        // waits for 'client' to 'connect'
 
-        client.BeginReceive(Receive, null);
+                while (s.Connected)
+                {
+                    byte[] d = new byte[s.ReceiveBufferSize];
+
+                    int length = s.Receive(d);
+
+                    if (length == 0) break;
+
+                    string message = Encoding.UTF8.GetString(d, 0, length).Trim();
+
+                    lock (lockObject)
+                    {
+                        lastMessage = message;
+                        newMessageReceived = true;
+                    }
+
+                }
+
+                s.Close();
+            }
+            catch (Exception)
+            {
+
+            }
+        }
     }
 
     void Update()
