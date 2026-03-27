@@ -40,6 +40,7 @@ public class Menu : MonoBehaviour
     {
         if (!string.IsNullOrEmpty(mapaSeleccionado) || mapaSeleccionado == "Null")
         {
+            Debug.Log("Sor Rita");
             SceneManager.LoadScene(mapaSeleccionado);
         }
     }
