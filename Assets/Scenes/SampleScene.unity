@@ -2874,7 +2874,7 @@ GameObject:
   m_Component:
   - component: {fileID: 920573906}
   m_Layer: 0
-  m_Name: Oboe
+  m_Name: Oboes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6333,6 +6333,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2020412771}
   - component: {fileID: 2020412770}
+  - component: {fileID: 2020412772}
   m_Layer: 0
   m_Name: Scripts
   m_TagString: Untagged
@@ -6369,6 +6370,41 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2020412772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2020412769}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c9f15ec212c16a45a9745d1a0dc7bec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GestorOrquesta
+  instrumentosEnEscena:
+  - nombre: Oboes
+    objetoPadre: {fileID: 920573905}
+  - nombre: Flautas
+    objetoPadre: {fileID: 369509254}
+  - nombre: Clarinetes
+    objetoPadre: {fileID: 1576029728}
+  - nombre: Fagotes
+    objetoPadre: {fileID: 576675058}
+  - nombre: Trompas
+    objetoPadre: {fileID: 1822124035}
+  - nombre: Trompetas
+    objetoPadre: {fileID: 703549709}
+  - nombre: Trombones
+    objetoPadre: {fileID: 874239649}
+  - nombre: Tuba
+    objetoPadre: {fileID: 1518565944}
+  - nombre: "Percusi\xF3n"
+    objetoPadre: {fileID: 756262462}
+  - nombre: Piano
+    objetoPadre: {fileID: 1570386361}
+  - nombre: Arpa
+    objetoPadre: {fileID: 1508157535}
 --- !u!1 &2025887234
 GameObject:
   m_ObjectHideFlags: 0
