@@ -4,6 +4,7 @@ using MidiPlayerTK;
 using UnityEngine;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 public class RecibeGestos : MonoBehaviour
 {
@@ -24,7 +25,9 @@ public class RecibeGestos : MonoBehaviour
     public bool calderonActive;
     private bool running = false;
 
-    private TcpListener listener;
+    private TcpListener tcpListener;
+
+    private UdpClient udpClient;
     // Para manejar los hilos de forma segura
     private byte[] lastMessage;
     private bool newMessageReceived = false;
@@ -38,47 +41,68 @@ public class RecibeGestos : MonoBehaviour
 
         calderonActive = false; // Corregido: ya no sombrea la variable global
 
-        listener = new TcpListener(IPAddress.Any, 5005);
-        listener.Start();
+        tcpListener = new TcpListener(IPAddress.Any, 5005);
+        tcpListener.Start();
 
+        udpClient = new UdpClient(5005);
+        
         running = true;
-
-        Thread w = new Thread(worker);
-        w.Start();
+        
+        _ = TcpWorker();
+        _ = UDPWorker();
     }
 
-    private void worker()
+    private async Task TcpWorker()
     {
         while (running)
         {
             try
             {
-                var s = listener.AcceptSocket();                        // waits for 'client' to 'connect'
-
-                while (s.Connected)
+                var client = await tcpListener.AcceptTcpClientAsync();                        // waits for 'client' to 'connect'
+                
+                var buffer = new byte[client.ReceiveBufferSize];
+                
+                var stream = client.GetStream();
+                
+                while (client.Connected)
                 {
-                    var d = new byte[s.ReceiveBufferSize];
-
-                    var length = s.Receive(d);
+                    var length = await stream.ReadAsync(buffer);
 
                     if (length == 0) break;
 
                     var message = new byte[length];
                     
-                    Array.Copy(d, message, length);
+                    Array.Copy(buffer, message, length);
                     
                     lock (lockObject)
                     {
                         lastMessage = message;
                         newMessageReceived = true;
                     }
-                    
                 }
 
-                s.Close();
+                client.Close();
             }
-            catch (Exception) { 
+            catch (Exception e) { 
+                Debug.LogError(e);
+            }
+        }
+    }
 
+    private async Task UDPWorker()
+    {
+        while (running)
+        {
+            try
+            {
+                var r = await udpClient.ReceiveAsync();
+                lock (lockObject)
+                {
+                    lastMessage = r.Buffer;
+                    newMessageReceived = true;
+                }
+            } catch (Exception e) { 
+                Debug.LogError(e);
             }
         }
     }
@@ -104,12 +128,12 @@ public class RecibeGestos : MonoBehaviour
 
     void HandleGesture(byte[] message)
     {
-        Debug.Log("Gesto recibido: " + message);
 
         // Comprobación de que el messageType es válido
         if (!Enum.IsDefined(typeof(MessageType), message[0])) return;
         
         var messageType = (MessageType) message[0];
+        // Debug.Log("Gesto recibido: " + messageType);
         
         // 1. Estado de Preparación
         if (messageType == MessageType.Ready)
@@ -123,7 +147,7 @@ public class RecibeGestos : MonoBehaviour
             midiPlayer.MPTK_Stop();
             midiPlayer.MPTK_TickCurrent = 0;
             calderonActive = false; // Resetear estados
-            Debug.Log("Director en posición correcta.");
+            // Debug.Log("Director en posición correcta.");
             return;
         }
 
@@ -135,7 +159,7 @@ public class RecibeGestos : MonoBehaviour
             else
                 midiPlayer.MPTK_UnPause();
 
-            Debug.Log("Iniciando música...");
+            // Debug.Log("Iniciando música...");
             return;
         }
 
@@ -147,7 +171,7 @@ public class RecibeGestos : MonoBehaviour
             midiPlayer.MPTK_Stop();
             // Importante: Asegurar que el volumen no se quede en 0
             if (midiPlayer.MPTK_Volume < 0.2f) midiPlayer.MPTK_Volume = 0.5f;
-            Debug.Log("Parando la música...");
+            // Debug.Log("Parando la música...");
             return;
         }
 
@@ -173,13 +197,14 @@ public class RecibeGestos : MonoBehaviour
         if (messageType == MessageType.VolumeUp)
         {
             midiPlayer.MPTK_Volume += 0.25f;
-            Debug.Log("Subiendo volumen...");
+            // Debug.Log("Subiendo volumen...");
             return;
         }
         
         if (messageType == MessageType.VolumeDown)
         {
             midiPlayer.MPTK_Volume -= 0.15f;
+            // Debug.Log("Bajando volumen...");
             return;
         }
     }
