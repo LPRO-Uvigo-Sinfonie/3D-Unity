@@ -12879,6 +12879,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c9f15ec212c16a45a9745d1a0dc7bec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GestorOrquesta
+  midiPlayer: {fileID: 1138455015}
   instrumentosEnEscena:
   - nombre: Oboes
     objetoPadre: {fileID: 920573905}
