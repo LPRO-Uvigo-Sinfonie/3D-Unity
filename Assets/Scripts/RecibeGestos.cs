@@ -201,8 +201,9 @@ public class RecibeGestos : MonoBehaviour
 
             var power = powerNormalized / 100f;
 
-            if (power + midiPlayer.MPTK_Volume >= 1.0f) {
-                midiPlayer.MPTK_Volume = 1.0f
+            if (power + midiPlayer.MPTK_Volume >= 1.0f)
+            {
+                midiPlayer.MPTK_Volume = 1.0f;
             } else {
                 midiPlayer.MPTK_Volume += power ;
             }
@@ -218,8 +219,9 @@ public class RecibeGestos : MonoBehaviour
 
             var power = powerNormalized / 100f;
 
-            if (midiPlayer.MPTK_Volume - power <= 0.2f){
-                midiPlayer.MPTK_Volume = 0.2f
+            if (midiPlayer.MPTK_Volume - power <= 0.2f)
+            {
+                midiPlayer.MPTK_Volume = 0.2f;
             } else {
                 midiPlayer.MPTK_Volume -= power ;
             }
