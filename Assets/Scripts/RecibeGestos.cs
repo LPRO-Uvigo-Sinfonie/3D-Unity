@@ -196,14 +196,34 @@ public class RecibeGestos : MonoBehaviour
         // Volumen 
         if (messageType == MessageType.VolumeUp)
         {
-            midiPlayer.MPTK_Volume += 0.25f;
+
+            var powerNormalized = message[1];
+
+            var power = powerNormalized / 100f;
+
+            if (power + midiPlayer.MPTK_Volume >= 1.0f) {
+                midiPlayer.MPTK_Volume = 1.0f
+            } else {
+                midiPlayer.MPTK_Volume += power ;
+            }
+
             // Debug.Log("Subiendo volumen...");
             return;
         }
         
         if (messageType == MessageType.VolumeDown)
         {
-            midiPlayer.MPTK_Volume -= 0.15f;
+
+            var powerNormalized = message[1];
+
+            var power = powerNormalized / 100f;
+
+            if (midiPlayer.MPTK_Volume - power <= 0.2f){
+                midiPlayer.MPTK_Volume = 0.2f
+            } else {
+                midiPlayer.MPTK_Volume -= power ;
+            }
+
             // Debug.Log("Bajando volumen...");
             return;
         }
