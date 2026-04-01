@@ -35,7 +35,7 @@ public class RecibeGestos : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("Buenas noches caballero");
+        Debug.Log("Start");
         if (midiPlayer == null)
             midiPlayer = FindFirstObjectByType<MidiFilePlayer>();
 
