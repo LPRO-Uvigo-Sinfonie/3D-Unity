@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.IO;
 using MidiPlayerTK;
+using UnityPdfViewer;
 
 public class GestorOrquesta : MonoBehaviour
 {
@@ -20,7 +22,8 @@ public class GestorOrquesta : MonoBehaviour
     void Start()
     {
         ConfigurarMidi();      
-        ConfigurarOrquesta();  
+        ConfigurarOrquesta();
+        CargarPdf();
     }
 
     void ConfigurarMidi()
@@ -63,6 +66,28 @@ public class GestorOrquesta : MonoBehaviour
             }
         }
     }
+    
+    void CargarPdf()
+    {
+        if (MidiPlayerGlobal.MPTK_ListMidi != null)
+        {
+            
+            // Recuperamos el nombre de la canción guardada en el menú
+            var cancion = EstadoOrquesta.cancionSeleccionada;
+
+            if (cancion == "Ninguna") cancion = "paquito-chocolatero";
+            
+            var pdfPath = Path.Join(Directory.GetCurrentDirectory(), "pdf", $"{cancion}.pdf");
+
+            Debug.Log(pdfPath);
+            
+            if (!File.Exists(pdfPath)) return;
+            
+            var pdfViewerUI = FindFirstObjectByType<PdfViewerUI>();
+            pdfViewerUI.LoadPDF(pdfPath);
+
+        }
+    }   
 }
 
 
