@@ -6,10 +6,15 @@ using UnityEngine;
 using System.IO;
 using System;
 using System.Threading;
+using System.Collections.Generic;
 
 public class RecibeGestos : MonoBehaviour
 {
     public MidiFilePlayer midiPlayer;
+    //public Animator animator;
+    [Header("Configuración de Orquesta")]
+    public string tagMusicos = "Musico";
+    private List<Animator> animadoresValidos = new List<Animator>();
     public bool calderonActive;
     private bool running = false;
 
@@ -22,8 +27,7 @@ public class RecibeGestos : MonoBehaviour
     void Start()
     {
         Debug.Log("Start");
-        if (midiPlayer == null)
-            midiPlayer = FindObjectOfType<MidiFilePlayer>();
+        if (midiPlayer == null) midiPlayer = FindObjectOfType<MidiFilePlayer>();
 
         calderonActive = false; // Corregido: ya no sombrea la variable global
 
@@ -34,6 +38,9 @@ public class RecibeGestos : MonoBehaviour
 
         Thread w = new Thread(worker);
         w.Start();
+
+        // Buscar los musicos activos que tienen animacion
+        ObtenerMusicos();
     }
 
     private void worker()
@@ -106,7 +113,20 @@ public class RecibeGestos : MonoBehaviour
             midiPlayer.MPTK_Stop();
             midiPlayer.MPTK_TickCurrent = 0;
             calderonActive = false; // Resetear estados
+
             Debug.Log("Director en posición correcta.");
+
+            // Animación: Disparamos trigger y apagamos el bucle de play
+            foreach (Animator anim in animadoresValidos)
+            {
+                if (anim == null) continue;
+
+                anim.SetTrigger("doReady");
+                anim.SetBool("isPlaying", false);
+            }
+            //animator.SetTrigger("doReady");
+            //animator.SetBool("isPlaying", false);
+            Debug.Log("Animación: READY");
         }
 
         // 2. Inicio de la música (al detectar movimiento)
@@ -118,6 +138,16 @@ public class RecibeGestos : MonoBehaviour
                 midiPlayer.MPTK_UnPause();
 
             Debug.Log("Iniciando música...");
+
+            // Animación: Activamos el booleano para que entre en bucle
+            foreach (Animator anim in animadoresValidos)
+            {
+                if (anim == null) continue;
+
+                anim.SetBool("isPlaying", true);
+            }
+            //animator.SetBool("isPlaying", true);
+            Debug.Log("Animación: PLAYING (Loop)");
         }
 
         // 3. Finalización (Cut-off)
@@ -129,6 +159,18 @@ public class RecibeGestos : MonoBehaviour
             // Importante: Asegurar que el volumen no se quede en 0
             if (midiPlayer.MPTK_Volume < 0.2f) midiPlayer.MPTK_Volume = 0.5f;
             Debug.Log("Parando la música...");
+
+            // Animación: Disparamos stop y cortamos el bucle de play
+            foreach (Animator anim in animadoresValidos)
+            {
+                if (anim == null) continue;
+
+                anim.SetTrigger("doStop");
+                anim.SetBool("isPlaying", false);
+            }
+            //animator.SetTrigger("doStop");
+            //animator.SetBool("isPlaying", false);
+            Debug.Log("Animación: STOP");
         }
 
         // Gesto del calderon
@@ -150,5 +192,22 @@ public class RecibeGestos : MonoBehaviour
         {
             midiPlayer.MPTK_Volume -= 0.15f;
         }
+    }
+
+    public void ObtenerMusicos()
+    {
+        animadoresValidos.Clear();
+        GameObject[] objetosMusicos = GameObject.FindGameObjectsWithTag(tagMusicos);
+
+        foreach (GameObject go in objetosMusicos)
+        {
+            Animator anim = go.GetComponent<Animator>();
+
+            if (anim != null && go.activeInHierarchy)
+            {
+                animadoresValidos.Add(anim);
+            }
+        }
+        Debug.Log("Orquesta actualizada: " + animadoresValidos.Count + " músicos listos.");
     }
 }
