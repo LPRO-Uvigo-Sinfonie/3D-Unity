@@ -7,6 +7,7 @@ public class Menu : MonoBehaviour
 {
     public GameObject menuOpciones;
     public GameObject menuPrincipal;
+    public GameObject menuMidi;
     private string mapaSeleccionado = "Null";
 
     [System.Serializable]
@@ -20,12 +21,21 @@ public class Menu : MonoBehaviour
 
     public void HabilitarPanelOpciones()
     {
-        menuPrincipal.SetActive(false);
+        menuMidi.SetActive(false);
         menuOpciones.SetActive(true);
+        menuPrincipal.SetActive(false);
+    }
+
+    public void HabilitarPanelMidi()
+    {
+        menuPrincipal.SetActive(false);
+        menuMidi.SetActive(true);
+        menuOpciones.SetActive(false);
     }
 
     public void HabilitarPanelPrincipal()
     {
+        menuMidi.SetActive(false);
         menuOpciones.SetActive(false);
         menuPrincipal.SetActive(true);
     }
