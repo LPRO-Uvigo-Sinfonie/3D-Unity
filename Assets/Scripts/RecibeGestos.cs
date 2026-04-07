@@ -26,14 +26,9 @@ public class RecibeGestos : MonoBehaviour
     private bool running = false;
 
     private TcpListener tcpListener;
-
     private UdpClient udpClient;
-    // Para manejar los hilos de forma segura
-    private byte[] lastMessage;
-    private bool newMessageReceived = false;
-    private readonly object lockObject = new object();
 
-    void Start()
+    public void Start()
     {
         Debug.Log("Start");
         if (midiPlayer == null)
@@ -50,6 +45,11 @@ public class RecibeGestos : MonoBehaviour
         
         _ = TcpWorker();
         _ = UDPWorker();
+    }
+
+    public void OnDestroy()
+    {
+        running = false;
     }
 
     private async Task TcpWorker()
@@ -73,12 +73,8 @@ public class RecibeGestos : MonoBehaviour
                     var message = new byte[length];
                     
                     Array.Copy(buffer, message, length);
-                    
-                    lock (lockObject)
-                    {
-                        lastMessage = message;
-                        newMessageReceived = true;
-                    }
+
+                    _ = HandleGesture(message);
                 }
 
                 client.Close();
@@ -96,37 +92,22 @@ public class RecibeGestos : MonoBehaviour
             try
             {
                 var r = await udpClient.ReceiveAsync();
-                lock (lockObject)
-                {
-                    lastMessage = r.Buffer;
-                    newMessageReceived = true;
-                }
+                _ = HandleGesture(r.Buffer);
             } catch (Exception e) { 
                 Debug.LogError(e);
             }
         }
     }
 
-    void Update()
+    public void Update()
     {
-        // 1. Procesar mensajes TCP/UDP en el hilo principal
-        if (newMessageReceived)
-        {
-            byte[] msg;
-            lock (lockObject)
-            {
-                msg = lastMessage;
-                newMessageReceived = false;
-            }
-            HandleGesture(msg);
-        }
-
-        // 2. Lógica del Calderón (KeepNoteOff evita que las notas se detengan)
+        // 1. Lógica del Calderón (KeepNoteOff evita que las notas se detengan)
         // Si calderonActive es true, KeepNoteOff debe ser true.
         midiPlayer.MPTK_KeepNoteOff = calderonActive;
     }
 
-    void HandleGesture(byte[] message)
+    #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+    private async Task HandleGesture(byte[] message)
     {
 
         // Comprobación de que el messageType es válido
