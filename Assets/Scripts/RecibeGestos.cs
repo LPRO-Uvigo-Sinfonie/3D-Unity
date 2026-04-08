@@ -5,6 +5,8 @@ using UnityEngine;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
+using TMPro;
 
 public class RecibeGestos : MonoBehaviour
 {
@@ -28,12 +30,17 @@ public class RecibeGestos : MonoBehaviour
     private TcpListener tcpListener;
     private UdpClient udpClient;
 
+    public TMP_Text textIndicanciones;
+    [CanBeNull] private CancellationTokenSource textIndicacionesCancelationToken;
+    
     public void Start()
     {
         Debug.Log("Start");
         if (midiPlayer == null)
             midiPlayer = FindFirstObjectByType<MidiFilePlayer>();
-
+        
+        textIndicanciones.text = "";
+        
         calderonActive = false; // Corregido: ya no sombrea la variable global
 
         tcpListener = new TcpListener(IPAddress.Any, 5005);
@@ -106,6 +113,22 @@ public class RecibeGestos : MonoBehaviour
         midiPlayer.MPTK_KeepNoteOff = calderonActive;
     }
 
+    private async Task SetIndication(string text, int delayClear = 750)
+    {
+        try
+        {
+            textIndicacionesCancelationToken ??= new CancellationTokenSource();
+            textIndicanciones.text = text;
+            await Task.Delay(delayClear, textIndicacionesCancelationToken.Token);
+            textIndicacionesCancelationToken.Token.ThrowIfCancellationRequested();
+            textIndicanciones.text = "";
+        }
+        catch
+        {
+            // Ignore
+        }
+    } 
+    
     #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     private async Task HandleGesture(byte[] message)
     {
@@ -119,6 +142,7 @@ public class RecibeGestos : MonoBehaviour
         // 1. Estado de Preparación
         if (messageType == MessageType.Ready)
         {
+            _ = SetIndication("Director listo");
             // Si el MIDI estaba pausado, lo prepara
             //midiPlayer.MPTK_UnPause();
             // Opcional: Podrías bajar el volumen o resetear la posición al inicio
@@ -135,6 +159,8 @@ public class RecibeGestos : MonoBehaviour
         // 2. Inicio de la música (al detectar movimiento)
         if (messageType == MessageType.Start)
         {
+            _ = SetIndication("Comienzo");
+
             if (!midiPlayer.MPTK_IsPlaying)
                 midiPlayer.MPTK_Play();
             else
@@ -147,6 +173,7 @@ public class RecibeGestos : MonoBehaviour
         // 3. Finalización (Cut-off)
         if (messageType == MessageType.Stop)
         {
+            _ = SetIndication("Finalización");
             //midiPlayer.MPTK_Stop();
             //Debug.Log("Final de la pieza.");
             midiPlayer.MPTK_Stop();
@@ -159,12 +186,14 @@ public class RecibeGestos : MonoBehaviour
         // Gesto del calderon
         if (messageType == MessageType.Calderon)
         {
+            _ = SetIndication("Calderón");
             calderonActive = true;
             return;
         }
         
         if (messageType == MessageType.OffCalderon)
         {
+            _ = SetIndication("Fin Calderón", 500);
             calderonActive = false; // Necesitas una señal para apagarlo
             return;
         }
@@ -178,6 +207,7 @@ public class RecibeGestos : MonoBehaviour
         if (messageType == MessageType.VolumeUp)
         {
 
+            _ = SetIndication("+ Volumen", 500);
             var powerNormalized = message[1];
 
             var power = powerNormalized / 100f;
@@ -195,7 +225,8 @@ public class RecibeGestos : MonoBehaviour
         
         if (messageType == MessageType.VolumeDown)
         {
-
+            _ = SetIndication("- Volumen", 500);
+            
             var powerNormalized = message[1];
 
             var power = powerNormalized / 100f;
