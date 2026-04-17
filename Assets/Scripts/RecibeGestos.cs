@@ -101,6 +101,25 @@ public class RecibeGestos : MonoBehaviour
     {
         Debug.Log("Gesto recibido: " + message);
 
+        // --- 1. PROCESAMIENTO DE VOLUMEN ANALÓGICO ---
+        if (message.StartsWith("VOL:"))
+        {
+            try
+            {
+                // Extraemos el valor eliminando el prefijo "VOL:"
+                string valueStr = message.Substring(4);
+                // Usamos InvariantCulture para que el "." de Python funcione siempre
+                float nuevoVolumen = float.Parse(valueStr, System.Globalization.CultureInfo.InvariantCulture);
+
+                midiPlayer.MPTK_Volume = nuevoVolumen;
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("Error al parsear volumen: " + e.Message);
+            }
+            return; // No procesamos más comandos si es una trama de volumen
+        }
+
         // 1. Estado de Preparación
         if (message == "READY")
         {
@@ -183,7 +202,7 @@ public class RecibeGestos : MonoBehaviour
         if (message == "READY") midiPlayer.MPTK_UnPause();
 
         // Volumen 
-        if (message == "VOLUME_UP")
+        /*if (message == "VOLUME_UP")
         {
             midiPlayer.MPTK_Volume += 0.25f;
             Debug.Log("Subiendo volumen...");
@@ -191,7 +210,7 @@ public class RecibeGestos : MonoBehaviour
         else if (message == "VOLUME_DOWN")
         {
             midiPlayer.MPTK_Volume -= 0.15f;
-        }
+        }*/
     }
 
     public void ObtenerMusicos()
