@@ -28,7 +28,15 @@ public class ModificarPartitura: MonoBehaviour
         
         var selectedPdfPath = selectedPaths[0];
 
-        File.Copy(selectedPdfPath, pdfPath);
+        try
+        {
+            File.Copy(selectedPdfPath, pdfPath);
+        }
+        catch
+        {
+            File.Delete(pdfPath);
+            File.Copy(selectedPdfPath, pdfPath);
+        }
     }
     
 }

@@ -39,6 +39,17 @@ public class RecibeGestos : MonoBehaviour
         if (midiPlayer == null)
             midiPlayer = FindFirstObjectByType<MidiFilePlayer>();
         
+        foreach (var c in midiPlayer.MPTK_Channels)
+        {
+            var presetNum = c.PresetNum;
+            var bankNum = c.BankNum;
+            var presetForced = c.ForcedPreset;
+            
+            var sPreset = presetForced == -1 ? $"{presetNum} / {bankNum}" : $"F{presetForced} / {bankNum}";
+            
+            Debug.LogFormat(sPreset);
+        }
+
         textIndicanciones.text = "";
         
         calderonActive = false; // Corregido: ya no sombrea la variable global

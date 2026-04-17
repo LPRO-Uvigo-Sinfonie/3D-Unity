@@ -101,23 +101,40 @@ public class GestorOrquesta : MonoBehaviour
             
             pdfViewerUI1.nextButton.onClick.AddListener(() =>
             {
+
+                pdfViewerUI1.NextPage();
                 
-                if (pdfViewerUI2.navigator.CurrentPage == pdfViewerUI2.navigator.TotalPages - 1)
+                if (pdfViewerUI1.navigator.CurrentPage == pdfViewerUI1.navigator.TotalPages - 2)
+                {
+                    pdfViewerUI1.nextButton.interactable = false;
+                }
+                
+                if (pdfViewerUI2.navigator.CurrentPage == pdfViewerUI2.navigator.TotalPages - 2)
                 {
                     pdfViewerUI2.pdfImage.texture = null;
                     return;
                 }
                 
                 pdfViewerUI2.NextPage();
+                pdfViewerUI2.NextPage();
             });
             
             pdfViewerUI1.previousButton.onClick.AddListener(() =>
             {
+
+                if (!pdfViewerUI1.nextButton.interactable)
+                {
+                    pdfViewerUI1.nextButton.interactable = true;
+                }
+                
+                pdfViewerUI1.PreviousPage();
+                
                 if (pdfViewerUI2.pdfImage.texture == null)
                 {
                     pdfViewerUI2.GoToPage(pdfViewerUI2.navigator.CurrentPage);
                     return;
                 }
+                pdfViewerUI2.PreviousPage();
                 pdfViewerUI2.PreviousPage();
             });
         }
