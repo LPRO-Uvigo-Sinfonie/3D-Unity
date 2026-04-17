@@ -18,25 +18,17 @@ public class ModificarPartitura: MonoBehaviour
  
         var cancion = EstadoOrquesta.cancionSeleccionada;
     
-        var selectedPaths = StandaloneFileBrowser.OpenFilePanel("Seleccionar", "", "pdf", true);
+        var selectedPaths = StandaloneFileBrowser.OpenFilePanel("Seleccionar", "", "pdf", false);
 
         if (selectedPaths.Length == 0) return;
         
         var pdfFolderPath = Path.Join(Directory.GetCurrentDirectory(), "pdf");
             
-        var pdfPart1Path = Path.Join(pdfFolderPath, $"{cancion}-1.pdf");
-        var pdfPart2Path = Path.Join(pdfFolderPath, $"{cancion}-2.pdf");
+        var pdfPath = Path.Join(pdfFolderPath, $"{cancion}.pdf");
         
-        var selectedPdfPart1Path = selectedPaths[0];
+        var selectedPdfPath = selectedPaths[0];
 
-        File.Copy(selectedPdfPart1Path, pdfPart1Path);
-        
-        if (selectedPaths.Length != 2) return;
-        
-        var selectedPdfPath2Path = selectedPaths[1];
-        
-        File.Copy(selectedPdfPath2Path, pdfPart2Path);
-        
+        File.Copy(selectedPdfPath, pdfPath);
     }
     
 }

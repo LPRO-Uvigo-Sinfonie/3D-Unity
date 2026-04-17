@@ -80,20 +80,24 @@ public class GestorOrquesta : MonoBehaviour
 
             var pdfFolderPath = Path.Join(Directory.GetCurrentDirectory(), "pdf");
             
-            var pdfPart1Path = Path.Join(pdfFolderPath, $"{cancion}-1.pdf");
-            var pdfPart2Path = Path.Join(pdfFolderPath, $"{cancion}-2.pdf");
-            
+            var pdfPath = Path.Join(pdfFolderPath, $"{cancion}.pdf");            
             // Debug.Log(pdfPart1Path);
             
-            if (!File.Exists(pdfPart1Path)) return;
+            if (!File.Exists(pdfPath)) return;
             
             var pdfViewerUI1 = GameObject.Find("PdfViewer1").GetComponent<PdfViewerUI>();
-            pdfViewerUI1.LoadPDF(pdfPart1Path);
-
-            if (!File.Exists(pdfPart2Path)) return;
+            pdfViewerUI1.LoadPDF(pdfPath);
 
             var pdfViewerUI2 = GameObject.Find("PdfViewer2").GetComponent<PdfViewerUI>();
-            pdfViewerUI2.LoadPDF(pdfPart2Path);
+            pdfViewerUI2.LoadPDF(pdfPath);
+            
+            if (pdfViewerUI2.navigator.CurrentPage == pdfViewerUI2.navigator.TotalPages - 1)
+            {
+                pdfViewerUI2.pdfImage.texture = null;
+            } else
+            {
+                pdfViewerUI2.NextPage();
+            }
             
             pdfViewerUI1.nextButton.onClick.AddListener(() =>
             {
