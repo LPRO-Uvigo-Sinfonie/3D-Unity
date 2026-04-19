@@ -18,6 +18,7 @@ EditorBuildSettings:
     path: Assets/Scenes/StudyGrabacion.unity
     guid: 26f39a689d7dfdd49abc9d15a361253a
   m_configObjects:
+    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 8e9f91abef5b9794f945fc01b94f8ff2, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: caaadea51cb1a2946a625af4830090f0, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 69a6c0e0e156e0245bb8648559287938, type: 2}
