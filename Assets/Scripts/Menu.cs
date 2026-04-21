@@ -8,6 +8,7 @@ public class Menu : MonoBehaviour
     public GameObject menuOpciones;
     public GameObject menuPrincipal;
     public GameObject menuMidi;
+    public GameObject menuInstrucciones;
     private string mapaSeleccionado = "Null";
 
     [System.Serializable]
@@ -24,6 +25,7 @@ public class Menu : MonoBehaviour
         menuMidi.SetActive(false);
         menuOpciones.SetActive(true);
         menuPrincipal.SetActive(false);
+        menuInstrucciones.SetActive(false);
     }
 
     public void HabilitarPanelMidi()
@@ -31,6 +33,15 @@ public class Menu : MonoBehaviour
         menuPrincipal.SetActive(false);
         menuMidi.SetActive(true);
         menuOpciones.SetActive(false);
+        menuInstrucciones.SetActive(false);
+    }
+
+    public void HabilitarPanelInstrucciones()
+    {
+        menuPrincipal.SetActive(false);
+        menuMidi.SetActive(false);
+        menuOpciones.SetActive(false);
+        menuInstrucciones.SetActive(true);
     }
 
     public void HabilitarPanelPrincipal()
@@ -38,6 +49,7 @@ public class Menu : MonoBehaviour
         menuMidi.SetActive(false);
         menuOpciones.SetActive(false);
         menuPrincipal.SetActive(true);
+        menuInstrucciones.SetActive(false);
     }
 
     public void SalirJuego()
