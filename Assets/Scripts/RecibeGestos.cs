@@ -4,13 +4,13 @@ using MidiPlayerTK;
 using UnityEngine;
 using System;
 using System.Threading;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using TMPro;
 
 public class RecibeGestos : MonoBehaviour
 {
-    
     enum MessageType : byte
     {
         Ready = 0,
@@ -22,8 +22,12 @@ public class RecibeGestos : MonoBehaviour
         VolumeDown = 21,
         Tempo = 30
     }
-    
+
     public MidiFilePlayer midiPlayer;
+
+    [Header("Configuración de Orquesta")]
+    public string tagMusicos = "Musico";
+    private List<Animator> animadoresValidos = new List<Animator>();
     public bool calderonActive;
     private bool running = false;
 
@@ -32,42 +36,57 @@ public class RecibeGestos : MonoBehaviour
 
     public TMP_Text textIndicanciones;
     [CanBeNull] private CancellationTokenSource textIndicacionesCancelationToken;
-    
+
     public void Start()
     {
         Debug.Log("Start");
         if (midiPlayer == null)
             midiPlayer = FindFirstObjectByType<MidiFilePlayer>();
-        
+
+        // Carga de configuración de canales
         foreach (var c in midiPlayer.MPTK_Channels)
         {
             var presetNum = c.PresetNum;
             var bankNum = c.BankNum;
             var presetForced = c.ForcedPreset;
-            
             var sPreset = presetForced == -1 ? $"{presetNum} / {bankNum}" : $"F{presetForced} / {bankNum}";
-            
             Debug.LogFormat(sPreset);
         }
 
         textIndicanciones.text = "";
-        
-        calderonActive = false; // Corregido: ya no sombrea la variable global
+        calderonActive = false;
 
         tcpListener = new TcpListener(IPAddress.Any, 5005);
         tcpListener.Start();
 
         udpClient = new UdpClient(5005);
-        
+
         running = true;
-        
+
+        // Lanzamiento de workers asíncronos (Mejora de rendimiento)
         _ = TcpWorker();
         _ = UDPWorker();
+
+        // Buscar los musicos activos que tienen animacion (Lógica VR)
+        ObtenerMusicos();
     }
 
     public void OnDestroy()
     {
         running = false;
+        tcpListener?.Stop();
+        udpClient?.Close();
+    }
+
+    private void ObtenerMusicos()
+    {
+        GameObject[] musicos = GameObject.FindGameObjectsWithTag(tagMusicos);
+        animadoresValidos.Clear();
+        foreach (GameObject musico in musicos)
+        {
+            Animator anim = musico.GetComponent<Animator>();
+            if (anim != null) animadoresValidos.Add(anim);
+        }
     }
 
     private async Task TcpWorker()
@@ -76,30 +95,21 @@ public class RecibeGestos : MonoBehaviour
         {
             try
             {
-                var client = await tcpListener.AcceptTcpClientAsync();                        // waits for 'client' to 'connect'
-                
+                var client = await tcpListener.AcceptTcpClientAsync();
                 var buffer = new byte[client.ReceiveBufferSize];
-                
                 var stream = client.GetStream();
-                
+
                 while (client.Connected)
                 {
                     var length = await stream.ReadAsync(buffer);
-
                     if (length == 0) break;
-
                     var message = new byte[length];
-                    
                     Array.Copy(buffer, message, length);
-
                     _ = HandleGesture(message);
                 }
-
                 client.Close();
             }
-            catch (Exception e) { 
-                Debug.LogError(e);
-            }
+            catch (Exception e) { Debug.LogError(e); }
         }
     }
 
@@ -111,16 +121,13 @@ public class RecibeGestos : MonoBehaviour
             {
                 var r = await udpClient.ReceiveAsync();
                 _ = HandleGesture(r.Buffer);
-            } catch (Exception e) { 
-                Debug.LogError(e);
             }
+            catch (Exception e) { Debug.LogError(e); }
         }
     }
 
     public void Update()
     {
-        // 1. Lógica del Calderón (KeepNoteOff evita que las notas se detengan)
-        // Si calderonActive es true, KeepNoteOff debe ser true.
         midiPlayer.MPTK_KeepNoteOff = calderonActive;
     }
 
@@ -128,46 +135,43 @@ public class RecibeGestos : MonoBehaviour
     {
         try
         {
-            textIndicacionesCancelationToken ??= new CancellationTokenSource();
+            textIndicacionesCancelationToken?.Cancel();
+            textIndicacionesCancelationToken = new CancellationTokenSource();
             textIndicanciones.text = text;
             await Task.Delay(delayClear, textIndicacionesCancelationToken.Token);
-            textIndicacionesCancelationToken.Token.ThrowIfCancellationRequested();
             textIndicanciones.text = "";
         }
-        catch
-        {
-            // Ignore
-        }
-    } 
-    
-    #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        catch (OperationCanceledException) { /* Ignorar al cancelar */ }
+        catch (Exception e) { Debug.LogWarning(e); }
+    }
+
     private async Task HandleGesture(byte[] message)
     {
-
-        // Comprobación de que el messageType es válido
+        if (message == null || message.Length == 0) return;
         if (!Enum.IsDefined(typeof(MessageType), message[0])) return;
-        
-        var messageType = (MessageType) message[0];
-        // Debug.Log("Gesto recibido: " + messageType);
-        
+
+        var messageType = (MessageType)message[0];
+
         // 1. Estado de Preparación
         if (messageType == MessageType.Ready)
         {
             _ = SetIndication("Director listo");
-            // Si el MIDI estaba pausado, lo prepara
-            //midiPlayer.MPTK_UnPause();
-            // Opcional: Podrías bajar el volumen o resetear la posición al inicio
-            //midiPlayer.MPTK_TickCurrent = 0;
-            //Debug.Log("Director preparado...");
-
             midiPlayer.MPTK_Stop();
             midiPlayer.MPTK_TickCurrent = 0;
-            calderonActive = false; // Resetear estados
-            // Debug.Log("Director en posición correcta.");
+            calderonActive = false;
+
+            foreach (Animator anim in animadoresValidos)
+            {
+                if (anim != null)
+                {
+                    anim.SetTrigger("doReady");
+                    anim.SetBool("isPlaying", false);
+                }
+            }
             return;
         }
 
-        // 2. Inicio de la música (al detectar movimiento)
+        // 2. Inicio de la música
         if (messageType == MessageType.Start)
         {
             _ = SetIndication("Comienzo");
@@ -177,79 +181,24 @@ public class RecibeGestos : MonoBehaviour
             else
                 midiPlayer.MPTK_UnPause();
 
-            // Debug.Log("Iniciando música...");
+            foreach (Animator anim in animadoresValidos)
+            {
+                if (anim != null) anim.SetBool("isPlaying", true);
+            }
             return;
         }
 
-        // 3. Finalización (Cut-off)
+        // 3. Finalización (Stop)
         if (messageType == MessageType.Stop)
         {
             _ = SetIndication("Finalización");
-            //midiPlayer.MPTK_Stop();
-            //Debug.Log("Final de la pieza.");
             midiPlayer.MPTK_Stop();
-            // Importante: Asegurar que el volumen no se quede en 0
             if (midiPlayer.MPTK_Volume < 0.2f) midiPlayer.MPTK_Volume = 0.5f;
-            // Debug.Log("Parando la música...");
-            return;
-        }
 
-        // Gesto del calderon
-        if (messageType == MessageType.Calderon)
-        {
-            _ = SetIndication("Calderón");
-            calderonActive = true;
-            return;
-        }
-        
-        if (messageType == MessageType.OffCalderon)
-        {
-            _ = SetIndication("Fin Calderón", 500);
-            calderonActive = false; // Necesitas una señal para apagarlo
-            return;
-        }
-
-        // // Resto de gestos        
-        // if (messageType == MessageType.Start) midiPlayer.MPTK_Play();
-        // if (messageType == MessageType.Stop) midiPlayer.MPTK_Stop();
-        // if (messageType == MessageType.Ready) midiPlayer.MPTK_UnPause();
-
-        // Volumen 
-        if (messageType == MessageType.VolumeUp)
-        {
-
-            _ = SetIndication("+ Volumen", 500);
-            var powerNormalized = message[1];
-
-            var power = powerNormalized / 100f;
-
-            if (power + midiPlayer.MPTK_Volume >= 1.0f)
+            foreach (Animator anim in animadoresValidos)
             {
-                midiPlayer.MPTK_Volume = 1.0f;
-            } else {
-                midiPlayer.MPTK_Volume += power ;
+                if (anim != null) anim.SetBool("isPlaying", false);
             }
-
-            // Debug.Log("Subiendo volumen...");
-            return;
-        }
-        
-        if (messageType == MessageType.VolumeDown)
-        {
-            _ = SetIndication("- Volumen", 500);
-            
-            var powerNormalized = message[1];
-
-            var power = powerNormalized / 100f;
-
-            if (midiPlayer.MPTK_Volume - power <= 0.2f)
-            {
-                midiPlayer.MPTK_Volume = 0.2f;
-            } else {
-                midiPlayer.MPTK_Volume -= power ;
-            }
-
-            // Debug.Log("Bajando volumen...");
             return;
         }
     }
