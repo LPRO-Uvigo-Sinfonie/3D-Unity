@@ -28,7 +28,6 @@ public class RecibeGestos : MonoBehaviour
     [Header("Configuración de Orquesta")]
     public string tagMusicos = "Musico";
     private List<Animator> animadoresValidos = new List<Animator>();
-    public bool calderonActive;
     private bool running = false;
 
     private TcpListener tcpListener;
@@ -49,12 +48,13 @@ public class RecibeGestos : MonoBehaviour
             var presetNum = c.PresetNum;
             var bankNum = c.BankNum;
             var presetForced = c.ForcedPreset;
+
             var sPreset = presetForced == -1 ? $"{presetNum} / {bankNum}" : $"F{presetForced} / {bankNum}";
+
             Debug.LogFormat(sPreset);
         }
 
         textIndicanciones.text = "";
-        calderonActive = false;
 
         tcpListener = new TcpListener(IPAddress.Any, 5005);
         tcpListener.Start();
@@ -63,19 +63,18 @@ public class RecibeGestos : MonoBehaviour
 
         running = true;
 
-        // Lanzamiento de workers asíncronos (Mejora de rendimiento)
+        // Workers asincronos
         _ = TcpWorker();
         _ = UDPWorker();
 
-        // Buscar los musicos activos que tienen animacion (Lógica VR)
         ObtenerMusicos();
     }
 
     public void OnDestroy()
     {
         running = false;
-        tcpListener?.Stop();
-        udpClient?.Close();
+        //tcpListener?.Stop();
+        //udpClient?.Close();
     }
 
     private void ObtenerMusicos()
@@ -109,7 +108,9 @@ public class RecibeGestos : MonoBehaviour
                 }
                 client.Close();
             }
-            catch (Exception e) { Debug.LogError(e); }
+            catch (Exception e) { 
+                Debug.LogError(e); 
+            }
         }
     }
 
@@ -122,29 +123,29 @@ public class RecibeGestos : MonoBehaviour
                 var r = await udpClient.ReceiveAsync();
                 _ = HandleGesture(r.Buffer);
             }
-            catch (Exception e) { Debug.LogError(e); }
+            catch (Exception e) { 
+                Debug.LogError(e); 
+            }
         }
-    }
-
-    public void Update()
-    {
-        midiPlayer.MPTK_KeepNoteOff = calderonActive;
     }
 
     private async Task SetIndication(string text, int delayClear = 750)
     {
         try
         {
-            textIndicacionesCancelationToken?.Cancel();
-            textIndicacionesCancelationToken = new CancellationTokenSource();
+            textIndicacionesCancelationToken ??= new CancellationTokenSource();
             textIndicanciones.text = text;
             await Task.Delay(delayClear, textIndicacionesCancelationToken.Token);
+            textIndicacionesCancelationToken.Token.ThrowIfCancellationRequested();
             textIndicanciones.text = "";
         }
-        catch (OperationCanceledException) { /* Ignorar al cancelar */ }
-        catch (Exception e) { Debug.LogWarning(e); }
+        catch
+        {
+            // Ignore
+        }
     }
 
+    #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     private async Task HandleGesture(byte[] message)
     {
         if (message == null || message.Length == 0) return;
@@ -158,7 +159,6 @@ public class RecibeGestos : MonoBehaviour
             _ = SetIndication("Director listo");
             midiPlayer.MPTK_Stop();
             midiPlayer.MPTK_TickCurrent = 0;
-            calderonActive = false;
 
             foreach (Animator anim in animadoresValidos)
             {
@@ -193,12 +193,50 @@ public class RecibeGestos : MonoBehaviour
         {
             _ = SetIndication("Finalización");
             midiPlayer.MPTK_Stop();
+
             if (midiPlayer.MPTK_Volume < 0.2f) midiPlayer.MPTK_Volume = 0.5f;
 
             foreach (Animator anim in animadoresValidos)
             {
                 if (anim != null) anim.SetBool("isPlaying", false);
             }
+            return;
+        }
+
+        // Volumen 
+        if (messageType == MessageType.VolumeUp)
+        {
+            _ = SetIndication("+ Volumen", 500);         
+            var powerNormalized = message[1];
+            var power = powerNormalized / 100f;
+
+            if (power + midiPlayer.MPTK_Volume >= 1.0f)
+            {
+                midiPlayer.MPTK_Volume = 1.0f;
+            }
+            else
+            {
+                midiPlayer.MPTK_Volume += power;
+            }
+
+            return;
+        }
+
+        if (messageType == MessageType.VolumeDown)
+        {
+            _ = SetIndication("- Volumen", 500);
+            var powerNormalized = message[1];
+            var power = powerNormalized / 100f;
+
+            if (midiPlayer.MPTK_Volume - power <= 0.2f)
+            {
+                midiPlayer.MPTK_Volume = 0.2f;
+            }
+            else
+            {
+                midiPlayer.MPTK_Volume -= power;
+            }
+
             return;
         }
     }
