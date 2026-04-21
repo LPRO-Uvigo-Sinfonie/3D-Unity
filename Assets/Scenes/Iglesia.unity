@@ -9901,11 +9901,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4314086310842868, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.258
+      value: -0.99
       objectReference: {fileID: 0}
     - target: {fileID: 4314086310842868, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.689
       objectReference: {fileID: 0}
     - target: {fileID: 4314086310842868, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: m_LocalPosition.z
@@ -9965,7 +9965,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6314586839941564368, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: m_Density
-      value: 60
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 6314586839941564368, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: m_Enabled
@@ -9973,7 +9973,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6314586839941564368, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: m_DecayTime
-      value: 1.49
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 6314586839941564368, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: m_ReverbDelay
@@ -9981,7 +9981,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6314586839941564368, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: m_ReverbLevel
-      value: 1030
+      value: 1200
       objectReference: {fileID: 0}
     - target: {fileID: 6314586839941564368, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: m_DecayHFRatio
@@ -9989,11 +9989,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6314586839941564368, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: m_ReverbPreset
-      value: 4
+      value: 27
       objectReference: {fileID: 0}
     - target: {fileID: 6314586839941564368, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: m_ReflectionsLevel
-      value: -370
+      value: -1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 7806412949259753475, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 0.86
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -17574,7 +17578,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RecibeGestos
   midiPlayer: {fileID: 1138455015}
   tagMusicos: Musico
-  textIndicanciones: {fileID: 0}
+  textIndicanciones: {fileID: 1967354985}
 --- !u!4 &2020412771
 Transform:
   m_ObjectHideFlags: 0
@@ -17602,7 +17606,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c9f15ec212c16a45a9745d1a0dc7bec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GestorOrquesta
-  midiPlayer: {fileID: 0}
+  midiPlayer: {fileID: 1138455015}
   instrumentosEnEscena:
   - nombre: Oboes
     objetoPadre: {fileID: 920573905}

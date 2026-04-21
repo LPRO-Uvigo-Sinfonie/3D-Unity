@@ -3283,10 +3283,18 @@ PrefabInstance:
       propertyPath: MPTK_EffectSoundFont
       value: 
       objectReference: {fileID: 692547472}
+    - target: {fileID: 4175269914769520444, guid: b05db732430401842ba42d09189be371, type: 3}
+      propertyPath: midiPlayer
+      value: 
+      objectReference: {fileID: 7006595311129802083}
     - target: {fileID: 4844888792312535031, guid: b05db732430401842ba42d09189be371, type: 3}
       propertyPath: m_Name
       value: Mudanza
       objectReference: {fileID: 0}
+    - target: {fileID: 6380923922349836248, guid: b05db732430401842ba42d09189be371, type: 3}
+      propertyPath: textIndicanciones
+      value: 
+      objectReference: {fileID: 568215273775086347}
     - target: {fileID: 8096330886692910428, guid: b05db732430401842ba42d09189be371, type: 3}
       propertyPath: m_LocalPosition.x
       value: 20.02468
@@ -3345,6 +3353,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8096330886692910428, guid: b05db732430401842ba42d09189be371, type: 3}
   m_PrefabInstance: {fileID: 7006595311129802081}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7006595311129802083 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3371731216403460026, guid: b05db732430401842ba42d09189be371, type: 3}
+  m_PrefabInstance: {fileID: 7006595311129802081}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fb0999ab241539438b0b012d2ea9779, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7059583489228597501
 GameObject:
   m_ObjectHideFlags: 0
