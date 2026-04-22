@@ -208,6 +208,7 @@ GameObject:
   m_Component:
   - component: {fileID: 619840212}
   - component: {fileID: 619840213}
+  - component: {fileID: 619840214}
   m_Layer: 0
   m_Name: Mesh Collider
   m_TagString: Untagged
@@ -253,6 +254,27 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
+--- !u!65 &619840214
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 619840211}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.76, y: 1.05, z: 1.87}
+  m_Center: {x: 1.11, y: -0.41, z: 0.65}
 --- !u!1 &671819253
 GameObject:
   m_ObjectHideFlags: 0
@@ -744,8 +766,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1830468229383515253, guid: dea1683cfc69e04499e5bce7d2caf775, type: 3}
+      propertyPath: m_CameraYOffset
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1830468229383515253, guid: dea1683cfc69e04499e5bce7d2caf775, type: 3}
       propertyPath: m_RequestedTrackingOriginMode
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1843870898682603099, guid: dea1683cfc69e04499e5bce7d2caf775, type: 3}
       propertyPath: m_SizeDelta.x
@@ -941,15 +967,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7732221994958723585, guid: dea1683cfc69e04499e5bce7d2caf775, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.79
+      value: -0.679
       objectReference: {fileID: 0}
     - target: {fileID: 7732221994958723585, guid: dea1683cfc69e04499e5bce7d2caf775, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.62
+      value: 0.341
       objectReference: {fileID: 0}
     - target: {fileID: 7732221994958723585, guid: dea1683cfc69e04499e5bce7d2caf775, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 4.159
+      value: 4.414
       objectReference: {fileID: 0}
     - target: {fileID: 7732221994958723585, guid: dea1683cfc69e04499e5bce7d2caf775, type: 3}
       propertyPath: m_LocalRotation.w
