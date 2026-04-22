@@ -3239,7 +3239,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3884003053241047933, guid: dea1683cfc69e04499e5bce7d2caf775, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4055747989916386321, guid: dea1683cfc69e04499e5bce7d2caf775, type: 3}
       propertyPath: m_IsActive
@@ -3313,6 +3313,10 @@ PrefabInstance:
       propertyPath: m_LocalScale.x
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5005557993685199346, guid: dea1683cfc69e04499e5bce7d2caf775, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5126738978598373067, guid: dea1683cfc69e04499e5bce7d2caf775, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -3364,6 +3368,10 @@ PrefabInstance:
     - target: {fileID: 5492650721275579070, guid: dea1683cfc69e04499e5bce7d2caf775, type: 3}
       propertyPath: m_SizeDelta.y
       value: 46
+      objectReference: {fileID: 0}
+    - target: {fileID: 5707585654950910647, guid: dea1683cfc69e04499e5bce7d2caf775, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5831957529293620681, guid: dea1683cfc69e04499e5bce7d2caf775, type: 3}
       propertyPath: m_IsActive
@@ -11949,63 +11957,6 @@ Transform:
   m_Children:
   - {fileID: 2038865559}
   m_Father: {fileID: 1290148731}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1356537060
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1356537062}
-  - component: {fileID: 1356537061}
-  m_Layer: 0
-  m_Name: RoutineTimingController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1356537061
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1356537060}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 754970a73e201694787a76901341dc92, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: MidiPlayer.Run::MidiPlayerTK.Routine
-  TimeBetweenSlowUpdateCalls: 0.14285715
-  ProfilerDebugAmount: 0
-  AutoTriggerManualTimeframe: 1
-  UpdateCoroutines: 0
-  FixedUpdateCoroutines: 0
-  LateUpdateCoroutines: 0
-  SlowUpdateCoroutines: 0
-  RealtimeUpdateCoroutines: 0
-  EditorUpdateCoroutines: 0
-  EditorSlowUpdateCoroutines: 0
-  EndOfFrameCoroutines: 0
-  ManualTimeframeCoroutines: 0
-  _instanceID: 1
---- !u!4 &1356537062
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1356537060}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1356605725
 PrefabInstance:
@@ -55077,7 +55028,6 @@ SceneRoots:
   - {fileID: 1127643759}
   - {fileID: 1138455014}
   - {fileID: 2020412771}
-  - {fileID: 1356537062}
   - {fileID: 1326973424}
   - {fileID: 306980542865001482}
   - {fileID: 2126848309}

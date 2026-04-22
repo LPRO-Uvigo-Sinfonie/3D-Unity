@@ -15,7 +15,6 @@
     <string>Albinoni - Adagio</string>
     <string>All Night Long</string>
     <string>Animal Crossing</string>
-    <string>Aqua - Lollipop Candy Man</string>
     <string>Bach - Fugue</string>
     <string>Bach - Little fugue G minor</string>
     <string>Bach - Prelude</string>
@@ -23,9 +22,7 @@
     <string>Bach - Toccata in D minor Organ</string>
     <string>Bach - Toccata in D minor Piano</string>
     <string>Bach - Trisonate 3iem mvt</string>
-    <string>Baez Joan - Here's to You</string>
     <string>Baez Joan - Plaisir D'Amour</string>
-    <string>Beattles - Michelle</string>
     <string>Beethoven-sonata-14-3</string>
     <string>Bizet - Arlesienne</string>
     <string>Bjork - Joga</string>
@@ -49,6 +46,7 @@
     <string>Dragon Ball Z - Battle Theme1</string>
     <string>Dragon Ball Z - Opening</string>
     <string>Dragon Ball Z - Super Butouden 2</string>
+    <string>dvorak-symphony-no-9-mvt-iv</string>
     <string>Eagles - Best Of My Love</string>
     <string>Everybody loves somebody sometime 1</string>
     <string>EVO - Boss Theme</string>
@@ -77,6 +75,7 @@
     <string>Mozart - Requiem Dies Irae</string>
     <string>Mozart - Requiem Introitus</string>
     <string>Mozart - Sonate 11 Alla Turca</string>
+    <string>Mozart-Turkish-march</string>
     <string>MPTK_Example 0001</string>
     <string>MPTK_Example 0021</string>
     <string>Nirvana - Smells Like Teen Spirit</string>
@@ -85,6 +84,7 @@
     <string>Patti Smith - Because the Night</string>
     <string>peaches-the-super-mario-bros-movie-kuppa-peaches-mario-movie</string>
     <string>Pergolesi - Stabat Mater</string>
+    <string>radetzky-march-opus-228</string>
     <string>Reayo - Amor de Hombre</string>
     <string>Salvador Henri - Jardin D'hiver</string>
     <string>Satie - Gnossienne 4</string>

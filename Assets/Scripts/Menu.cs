@@ -9,7 +9,7 @@ public class Menu : MonoBehaviour
     public GameObject menuPrincipal;
     public GameObject menuMidi;
     public GameObject menuInstrucciones;
-    private string mapaSeleccionado = "Null";
+    private string mapaSeleccionado = "SampleScene";
 
     [System.Serializable]
     public struct InstrumentoToggle

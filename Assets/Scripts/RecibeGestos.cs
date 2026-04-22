@@ -20,6 +20,7 @@ public class RecibeGestos : MonoBehaviour
         OffCalderon = 11,
         VolumeUp = 20,
         VolumeDown = 21,
+        Volume = 22,
         Tempo = 30
     }
 
@@ -42,24 +43,13 @@ public class RecibeGestos : MonoBehaviour
         if (midiPlayer == null)
             midiPlayer = FindFirstObjectByType<MidiFilePlayer>();
 
-        // Carga de configuración de canales
-        foreach (var c in midiPlayer.MPTK_Channels)
-        {
-            var presetNum = c.PresetNum;
-            var bankNum = c.BankNum;
-            var presetForced = c.ForcedPreset;
-
-            var sPreset = presetForced == -1 ? $"{presetNum} / {bankNum}" : $"F{presetForced} / {bankNum}";
-
-            Debug.LogFormat(sPreset);
-        }
+        midiPlayer.MPTK_KeepNoteOff = false;
 
         textIndicanciones.text = "";
-
-        tcpListener = new TcpListener(IPAddress.Any, 5005);
+        tcpListener = new TcpListener(IPAddress.Any, 8090);
         tcpListener.Start();
 
-        udpClient = new UdpClient(5005);
+        udpClient = new UdpClient(8090);
 
         running = true;
 
@@ -84,7 +74,7 @@ public class RecibeGestos : MonoBehaviour
         foreach (GameObject musico in musicos)
         {
             Animator anim = musico.GetComponent<Animator>();
-            if (anim != null) animadoresValidos.Add(anim);
+            animadoresValidos?.Add(anim);
         }
     }
 
@@ -153,7 +143,8 @@ public class RecibeGestos : MonoBehaviour
 
         var messageType = (MessageType)message[0];
 
-        // 1. Estado de Preparación
+        Debug.Log(messageType);
+        // // 1. Estado de Preparación
         if (messageType == MessageType.Ready)
         {
             _ = SetIndication("Director listo");
@@ -162,11 +153,8 @@ public class RecibeGestos : MonoBehaviour
 
             foreach (Animator anim in animadoresValidos)
             {
-                if (anim != null)
-                {
-                    anim.SetTrigger("doReady");
-                    anim.SetBool("isPlaying", false);
-                }
+                anim?.SetTrigger("doReady");
+                anim?.SetBool("isPlaying", false);
             }
             return;
         }
@@ -183,7 +171,7 @@ public class RecibeGestos : MonoBehaviour
 
             foreach (Animator anim in animadoresValidos)
             {
-                if (anim != null) anim.SetBool("isPlaying", true);
+                anim?.SetBool("isPlaying", true);
             }
             return;
         }
@@ -198,44 +186,20 @@ public class RecibeGestos : MonoBehaviour
 
             foreach (Animator anim in animadoresValidos)
             {
-                if (anim != null) anim.SetBool("isPlaying", false);
+                anim?.SetTrigger("doStop");
+                anim?.SetBool("isPlaying", false);
             }
             return;
         }
 
         // Volumen 
-        if (messageType == MessageType.VolumeUp)
+        if (messageType == MessageType.Volume)
         {
-            _ = SetIndication("+ Volumen", 500);         
+            _ = SetIndication("Cambio de Volumen", 500);         
             var powerNormalized = message[1];
             var power = powerNormalized / 100f;
 
-            if (power + midiPlayer.MPTK_Volume >= 1.0f)
-            {
-                midiPlayer.MPTK_Volume = 1.0f;
-            }
-            else
-            {
-                midiPlayer.MPTK_Volume += power;
-            }
-
-            return;
-        }
-
-        if (messageType == MessageType.VolumeDown)
-        {
-            _ = SetIndication("- Volumen", 500);
-            var powerNormalized = message[1];
-            var power = powerNormalized / 100f;
-
-            if (midiPlayer.MPTK_Volume - power <= 0.2f)
-            {
-                midiPlayer.MPTK_Volume = 0.2f;
-            }
-            else
-            {
-                midiPlayer.MPTK_Volume -= power;
-            }
+            midiPlayer.MPTK_Volume = power;
 
             return;
         }
