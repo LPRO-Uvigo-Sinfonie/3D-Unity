@@ -45,6 +45,9 @@ public class RecibeGestos : MonoBehaviour
 
         midiPlayer.MPTK_KeepNoteOff = false;
 
+
+        ObtenerMusicos();
+
         textIndicanciones.text = "";
         tcpListener = new TcpListener(IPAddress.Any, 8090);
         tcpListener.Start();
@@ -56,8 +59,6 @@ public class RecibeGestos : MonoBehaviour
         // Workers asincronos
         _ = TcpWorker();
         _ = UDPWorker();
-
-        ObtenerMusicos();
     }
 
     public void OnDestroy()
@@ -76,6 +77,7 @@ public class RecibeGestos : MonoBehaviour
             Animator anim = musico.GetComponent<Animator>();
             animadoresValidos?.Add(anim);
         }
+        Debug.Log(animadoresValidos.Count + " músicos listos");
     }
 
     private async Task TcpWorker()
@@ -153,9 +155,12 @@ public class RecibeGestos : MonoBehaviour
 
             foreach (Animator anim in animadoresValidos)
             {
-                anim?.SetTrigger("doReady");
-                anim?.SetBool("isPlaying", false);
+                if (anim == null) continue;
+
+                anim.SetTrigger("doReady");
+                anim.SetBool("isPlaying", false);
             }
+
             return;
         }
 
@@ -171,7 +176,8 @@ public class RecibeGestos : MonoBehaviour
 
             foreach (Animator anim in animadoresValidos)
             {
-                anim?.SetBool("isPlaying", true);
+                if (anim == null) continue;
+                anim.SetBool("isPlaying", true);
             }
             return;
         }
@@ -186,8 +192,10 @@ public class RecibeGestos : MonoBehaviour
 
             foreach (Animator anim in animadoresValidos)
             {
-                anim?.SetTrigger("doStop");
-                anim?.SetBool("isPlaying", false);
+                if(anim == null) continue;
+
+                anim.SetTrigger("doStop");
+                anim.SetBool("isPlaying", false);
             }
             return;
         }
