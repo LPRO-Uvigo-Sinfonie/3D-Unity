@@ -87,18 +87,21 @@ public class RecibeGestos : MonoBehaviour
             try
             {
                 var client = await tcpListener.AcceptTcpClientAsync();
-                var buffer = new byte[client.ReceiveBufferSize];
-                var stream = client.GetStream();
-
-                while (client.Connected)
+                _ = Task.Run(async () =>
                 {
-                    var length = await stream.ReadAsync(buffer);
-                    if (length == 0) break;
-                    var message = new byte[length];
-                    Array.Copy(buffer, message, length);
-                    _ = HandleGesture(message);
-                }
-                client.Close();
+                    var buffer = new byte[client.ReceiveBufferSize];
+                    var stream = client.GetStream();
+
+                    while (client.Connected)
+                    {
+                        var length = await stream.ReadAsync(buffer);
+                        if (length == 0) break;
+                        var message = new byte[length];
+                        Array.Copy(buffer, message, length);
+                        _ = HandleGesture(message);
+                    }
+                    client.Close();
+                });
             }
             catch (Exception e) { 
                 Debug.LogError(e); 
