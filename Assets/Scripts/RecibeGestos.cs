@@ -16,8 +16,7 @@ public class RecibeGestos : MonoBehaviour
         Ready = 0,
         Start = 1,
         Stop = 2,
-        Calderon = 10,
-        OffCalderon = 11,
+        Manos = 3,
         VolumeUp = 20,
         VolumeDown = 21,
         Volume = 22,
@@ -251,6 +250,14 @@ public class RecibeGestos : MonoBehaviour
             var power = powerNormalized / 100f;
 
             midiPlayer.MPTK_Volume = power;
+
+            return;
+        }
+
+        //IDLE to Ready
+        if (messageType == MessageType.Manos)
+        {
+            _ = SetIndication("Manos bien colocadas, espere 3s",2900);
 
             return;
         }
