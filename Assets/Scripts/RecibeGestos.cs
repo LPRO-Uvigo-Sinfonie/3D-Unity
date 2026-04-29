@@ -37,6 +37,10 @@ public class RecibeGestos : MonoBehaviour
     public TMP_Text textIndicanciones;
     [CanBeNull] private CancellationTokenSource textIndicacionesCancelationToken;
 
+    private float tiempoUltimoPulso = 0f;
+    private float bpmCalculado = 0f;
+    private float bpmBaseArchivo = 0f;
+
     public void Start()
     {
         Debug.Log("Start");
@@ -140,6 +144,35 @@ public class RecibeGestos : MonoBehaviour
         }
     }
 
+    private void EjecutarCambioRitmo()
+    {
+        float tiempoActual = Time.time;
+
+        // 1. ARRANQUE EN FRÍO
+        if (!midiPlayer.MPTK_IsPlaying)
+        {
+            midiPlayer.MPTK_Play();
+            bpmBaseArchivo = (float)midiPlayer.MPTK_Tempo;
+            if (bpmBaseArchivo <= 0) bpmBaseArchivo = 120f; 
+            
+            bpmCalculado = bpmBaseArchivo;
+            tiempoUltimoPulso = tiempoActual;
+            return;
+        }
+
+        float deltaT = tiempoActual - tiempoUltimoPulso;
+
+        // 2. BLOQUEO ANTI-REBOTE
+        if (deltaT > 0.1f) 
+        {
+            bpmCalculado = 60f / deltaT;
+            bpmCalculado = Mathf.Clamp(bpmCalculado, 30f, 300f); 
+            
+            midiPlayer.MPTK_Speed = bpmCalculado / bpmBaseArchivo;
+            tiempoUltimoPulso = tiempoActual;
+        }
+    }
+
     #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     private async Task HandleGesture(byte[] message)
     {
@@ -149,6 +182,13 @@ public class RecibeGestos : MonoBehaviour
         var messageType = (MessageType)message[0];
 
         Debug.Log(messageType);
+
+        if (messageType == MessageType.Tempo)
+        {
+            EjecutarCambioRitmo();
+            return;
+        }
+
         // // 1. Estado de Preparación
         if (messageType == MessageType.Ready)
         {
