@@ -145,12 +145,15 @@ public class RecibeGestos : MonoBehaviour
 
     private void EjecutarCambioRitmo()
     {
+        Debug.Log(bpmCalculado / bpmBaseArchivo);
+        Debug.Log(Time.time);
         float tiempoActual = Time.time;
+        Debug.Log("Dentro cambio ritmo");
 
         // 1. ARRANQUE EN FRÍO
         if (!midiPlayer.MPTK_IsPlaying)
         {
-            midiPlayer.MPTK_Play();
+            // midiPlayer.MPTK_Play();
             bpmBaseArchivo = (float)midiPlayer.MPTK_Tempo;
             if (bpmBaseArchivo <= 0) bpmBaseArchivo = 120f; 
             
@@ -167,6 +170,8 @@ public class RecibeGestos : MonoBehaviour
             bpmCalculado = 60f / deltaT;
             bpmCalculado = Mathf.Clamp(bpmCalculado, 30f, 300f); 
             
+            Debug.Log("Speed");
+
             midiPlayer.MPTK_Speed = bpmCalculado / bpmBaseArchivo;
             tiempoUltimoPulso = tiempoActual;
         }
@@ -180,11 +185,13 @@ public class RecibeGestos : MonoBehaviour
 
         var messageType = (MessageType)message[0];
 
-        Debug.Log(messageType);
+        //Debug.Log(messageType);
 
         if (messageType == MessageType.Tempo)
         {
+            Debug.Log("Ritmo");
             EjecutarCambioRitmo();
+            Debug.Log("Fin Ritmo");
             return;
         }
 
